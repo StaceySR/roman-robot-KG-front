@@ -203,7 +203,6 @@ wss.on('connection', (ws) => {
         }
         fs.writeFileSync('./data/data.txt', JSON.stringify(dataList));
 
-
         // 广播消息给所有连接的客户端（包括 index.vue），通知数据已经更新
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
@@ -217,14 +216,99 @@ wss.on('connection', (ws) => {
             }
             client.send(JSON.stringify(updateMessage))
           }
-        });
+        })
+        break
+
+      case 'searchRelatedNodes':
+        // search算法
+        // 1. 首先根据task objective去定位，可以直接捕捉到最相关的一些location，那就是作为备选结果
+        let episodeData = payload
+        const task = episodeData.TASK_OBJECTIVE
+        let task_releated_locations_list = []
+        let task_user_time_related_locations_list = {}
+        let task_user_time_style_related_locations_list = {}
+        for (let index = 0; index < dataList.nodes.length; index++) {
+          const node_element = dataList.nodes[index]
+          if (node_element.type == 'TASK_OBJECTIVE' && node_element.label == task) {
+            // 找到相同的task——objective，再找个与这个task直接关联的location
+
+            for (let index = 0; index < dataList.edges.length; index++) {
+              const edge_element = dataList.edges[index];
+              if (edge_element.target == node_element.id) { // task_objective作为target的edge
+                const source_locations_id = edge_element.source
+                for (let index = 0; index < dataList.nodes.length; index++) {
+                  const source_node_element = dataList.nodes[index];
+                  if (source_node_element.id == source_locations_id && source_node_element.type == 'LOCATIONS') { // 在task_objective作为target的edge的基础上，以location作为source
+                    // 与这个task直接关联的locations
+                    console.log('related_locations: ', source_node_element.label, source_node_element.type)
+                    task_releated_locations_list.push(source_node_element)
+
+                    // （可能有多个locations），找到一个location之后，验证这个location的条件：
+                    // 1. 直接关联的user和time与episodeData中的是否一致；
+                    // 2. 更严格的，如果user和time一致，那与user直接关联的style是否与episodeData中的一致。
+
+                    let task_location_user_list = []
+                    let task_location_time_list = []
+                    let task_location_user_style_list = {}
+
+                    for (let index = 0; index < dataList.edges.length; index++) {
+                      const user_edge_element = dataList.edges[index];
+                      if (user_edge_element.source == source_locations_id) { // location作为source的edge
+                        // 寻找与location相关的user和time，判断是否与episodeData中的相同
+                        for (let index = 0; index < dataList.nodes.length; index++) {
+                          const user_node_element = dataList.nodes[index]
+                          // 判断user是不是相同
+                          if (user_node_element.id == user_edge_element.target && user_node_element.type == 'USER_PROPERTY' && user_node_element.label == episodeData.USER_PROPERTY) {
+                            // user_flag = true
+                            console.log('关联并且相同的user：', user_node_element.label)
+                            task_location_user_list.push(user_node_element)
+
+                            // 寻找与user关联的style，判断是否与episodeData中的相同
+                            for (let index = 0; dataList.edges< array.length; index++) {
+                              const style_edge_element = dataList.edges[index];
+                              if (style_edge_element.source == user_node_element.id) {
+                                for (let index = 0; index < dataList.nodes.length; index++) {
+                                  const style_node_element = dataList.nodes[index];
+                                  // 判断style是不是相同
+                                  if (style_node_element.id == style_edge_element.target && style_node_element.type == 'STYLE' && style_node_element.label == episodeData.STYLE) {
+                                      // style_flag = true
+                                      console.log('关联并且相同的style：', style_node_element.label)
+                                      task_location_user_style_list[user_node_element.label].push(style_node_element)
+                                    }
+                                }
+                              }
+                            }
+                          } else {
+                            // 判断time是不是相同
+                            if (user_node_element.id == user_edge_element.target && user_node_element.type == 'TIMESTAMP' && user_node_element.label == episodeData.TIMESTAMP) {
+                              // time_flag = true
+                              console.log('关联并且相同的time：', user_node_element.label)
+                              task_location_time_list.push(user_node_element)
+                            }
+                          }
+                        }
+                      }
+                    }
+                    if (task_location_user_list.length > 0 && task_location_time_list.length > 0) {
+                      console.log('user和time、location都相同的task')
+                      task_user_time_related_locations_list[source_node_element.id] = {'location': source_node_element, 'user': task_location_user_list, 'time': task_location_time_list}
+
+                      if (task_location_user_style_list.length > 0) {
+                        console.log('连style都相同。')
+                        task_user_time_style_related_locations_list[source_node_element.id] = {'location': source_node_element, 'user': task_location_user_list, 'time': task_location_time_list, 'style': task_location_user_style_list}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        console.log('task_releated_locations_list: ', task_releated_locations_list)
+        console.log('task_user_time_related_locations_list: ', task_user_time_related_locations_list)
+        console.log('task_user_time_style_related_locations_list: ', task_user_time_style_related_locations_list)
         break;
-      case 'otherMessageType':
-        // 在这里处理其他类型的消息
-        // ...
-        break;
-      // 可以根据需要添加更多的消息类型
-      // ...
+
       default:
         console.log('Unknown message type:', messageType);
     }

@@ -171,7 +171,7 @@ export default {
     dialogVisible: false,
     uploadData: {},
     fileList: [],
-    layout: 'circular',
+    layout: 'dagre',
     layouts: [{label: '随机布局', value: 'random'}, {label: '力导向布局', value: 'force'}, {label: 'Fruchterman布局', value: 'fruchterman'}, {label: '环形布局', value: 'circular'}, {label: '辐射布局', value: 'radial'},
       {label: '层次布局', value: 'dagre'}, {label: '同心圆布局', value: 'concentric'}, {label: '网格布局', value: 'grid'}]
   }),
@@ -383,7 +383,7 @@ export default {
         })
       }
       this.graph.updateLayout({
-        type: 'circular'
+        type: 'dagre'
       })
       this.dialogVisible = false
     },

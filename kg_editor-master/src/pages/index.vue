@@ -150,7 +150,7 @@ export default {
         layout: {
           // type: 'force',
           // 初始布局形式
-          type: 'circular',
+          type: 'dagre',
           nodeStrength: -30,
           preventOverlap: true,
           nodeSize: 40,

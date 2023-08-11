@@ -8,7 +8,7 @@ const state = {
     nodes: [
       {id: 'node0', label: 'pop-up market', size: [140, 140], type: 'LOCATIONS', style: {fill: '#5B77AE', stroke: '#4682B4', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3}, labelCfg: {position: 'center', style: {fill: '#FFFFFF', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}}},
       {id: 'node1', label: 'Cyber-punk', size: [140, 140], type: 'STYLE', style: {fill: '#F4F8D8', stroke: '#F4F8D8', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3}, labelCfg: {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}}},
-      {id: 'node2', label: 'Take Photos', size: [160, 160], type: 'TASK_OBJECTIVE', style: {fill: '#E9E7F6', stroke: '#E9E7F6', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3}, labelCfg: {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}}},
+      {id: 'node2', label: 'Take Photos', size: [170, 170], type: 'TASK_OBJECTIVE', style: {fill: '#E9E7F6', stroke: '#E9E7F6', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3}, labelCfg: {position: 'center', style: {fill: '#5B77AE', fontWeight: 1000, opacity: 1, fontFamily: '微软雅黑', fontSize: 20}}},
       {id: 'node3', label: 'Weekends', size: [140, 140], type: 'TIMESTAMP', style: {fill: '#FEEED6', stroke: '#FEEED6', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3}, labelCfg: {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}}},
       {id: 'node4', label: 'Scissors pose', size: [140, 140], type: 'ACTION_POSTURE', style: {fill: '#FFEEF6', stroke: '#FFEEF6', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3}, labelCfg: {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}}},
       {id: 'node5', label: 'Trendy man', size: [140, 140], type: 'USER_PROPERTY', style: {fill: '#EDF8FB', stroke: '#EDF8FB', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3}, labelCfg: {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}}}
@@ -86,9 +86,9 @@ const mutations = {
     }
     if (param.type === 'TASK_OBJECTIVE') {
       console.log('type: ', param.type)
-      param.size = [140, 140]
+      param.size = [170, 170]
       param.style = {fill: '#E9E7F6', stroke: '#E9E7F6', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3}
-      param.labelCfg = {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}}
+      param.labelCfg = {position: 'center', style: {fill: '#5B77AE', fontWeight: 1000, opacity: 1, fontFamily: '微软雅黑', fontSize: 20}}
     }
     if (param.type === 'TIMESTAMP') {
       console.log('type: ', param.type)

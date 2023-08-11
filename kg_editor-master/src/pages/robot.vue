@@ -63,7 +63,7 @@ export default {
       episodeVectorList: [],
       nodeSyle: {
         'USER_PROPERTY': {fill: '#EDF8FB', stroke: '#EDF8FB', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3},
-        'TASK_OBJECTIVE': {fill: '#E9E7F6', stroke: '#E9E7F6', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3},
+        'TASK_OBJECTIVE': {fill: '#E9E7F6', stroke: '#5B77AE', lineWidth: 3, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3},
         'STYLE': {fill: '#F4F8D8', stroke: '#F4F8D8', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3},
         'TIMESTAMP': {fill: '#FEEED6', stroke: '#FEEED6', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3},
         'ACTION_POSTURE': {fill: '#FFEEF6', stroke: '#FFEEF6', lineWidth: 1, shadowColor: '#909399', shadowBlur: 10, shadowOffsetX: 3, shadowOffsetY: 3},
@@ -71,7 +71,7 @@ export default {
       },
       nodeLabelStyle: {
         'USER_PROPERTY': {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}},
-        'TASK_OBJECTIVE': {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}},
+        'TASK_OBJECTIVE': {position: 'center', style: {fill: '#5B77AE', fontWeight: 1000, opacity: 1, fontFamily: '微软雅黑', fontSize: 20}},
         'STYLE': {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}},
         'TIMESTAMP': {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}},
         'ACTION_POSTURE': {position: 'center', style: {fill: '#000000', fontWeight: 800, opacity: 1, fontFamily: '微软雅黑', fontSize: 18}},
@@ -236,45 +236,23 @@ export default {
         return null
       }
     },
-    async learnNewEpisode () {
-      // 先判断能否从该episode中学习得到新知识
-      const userPropertyInput = document.getElementById('user-property')
-      const taskObjectiveInput = document.getElementById('task-objective')
-      const styleInput = document.getElementById('style')
-      const timeStampInput = document.getElementById('timestamp')
-      const questionInput = document.getElementById('questions')
-
-      this.userProperty = userPropertyInput.value
-      this.taskObjective = taskObjectiveInput.value
-      this.style = styleInput.value
-      this.timeStamp = timeStampInput.value
-      this.question = questionInput.value
-
-      // this.episodeData.userProperty = this.userProperty
-      this.episodeData.userProperty = {type: '运动达人', sex: '女'}
-      // this.episodeData.style = this.style
-      this.episodeData.style = '复古风'
-      this.episodeData.timeStamp = this.timeStamp
-      this.episodeData.taskObjective = this.taskObjective
-      this.episodeData.actionPosture = null
-      this.episodeData.location = null
-
+    async learnNewEpisode (learnEpisodeData, newNode) {
       // 学习过程
-      const learnEpisodeData = await this.keepSimilarEpisodeInfo(this.episodeData)
+      // const learnEpisodeData = await this.keepSimilarEpisodeInfo(this.episodeData)
       // 定义这次学习过程中要保存的nodeList
       let nodeList = []
       if (learnEpisodeData) {
         console.log('学习到的episode信息：', learnEpisodeData)
 
-        const newNode = {
-          'USER_PROPERTY': this.userProperty,
-          // 'userProperty': '文艺女青年',
-          'TASK_OBJECTIVE': this.taskObjective,
-          'STYLE': this.style,
-          'TIMESTAMP': this.timeStamp,
-          'ACTION_POSTURE': null,
-          'LOCATIONS': '商场'
-        }
+        // const newNode = {
+        //   'USER_PROPERTY': this.userProperty,
+        //   // 'userProperty': '文艺女青年',
+        //   'TASK_OBJECTIVE': this.taskObjective,
+        //   'STYLE': this.style,
+        //   'TIMESTAMP': this.timeStamp,
+        //   'ACTION_POSTURE': null,
+        //   'LOCATIONS': '商场'
+        // }
 
         // 选择把episodeData中的有效节点信息都保存至KG，即不为空的信息
         for (let key in newNode) {
@@ -312,15 +290,67 @@ export default {
         ws.close()
       }
     },
-    searchNewRelateNode () {
-      this.learnNewEpisode()
+    async searchNewRelateNode () {
+      // 先判断能否从该episode中学习得到新知识
+      const userPropertyInput = document.getElementById('user-property')
+      const taskObjectiveInput = document.getElementById('task-objective')
+      const styleInput = document.getElementById('style')
+      const timeStampInput = document.getElementById('timestamp')
+      const questionInput = document.getElementById('questions')
+
+      this.userProperty = userPropertyInput.value
+      this.taskObjective = taskObjectiveInput.value
+      this.style = styleInput.value
+      this.timeStamp = timeStampInput.value
+      this.question = questionInput.value
+
+      // this.episodeData.userProperty = this.userProperty
+      this.episodeData.userProperty = {type: '运动达人', sex: '女'}
+      // this.episodeData.style = this.style
+      this.episodeData.style = '复古风'
+      this.episodeData.timeStamp = this.timeStamp
+      this.episodeData.taskObjective = this.taskObjective
+      this.episodeData.actionPosture = null
+      this.episodeData.location = null
+
+      const newNode = {
+        'USER_PROPERTY': this.userProperty,
+        // 'userProperty': '文艺女青年',
+        'TASK_OBJECTIVE': this.taskObjective,
+        'STYLE': this.style,
+        'TIMESTAMP': this.timeStamp,
+        'ACTION_POSTURE': null,
+        'LOCATIONS': null // 一开始是null，是用户询问机器人得到的结果。
+      }
+
+      // 判断episode的相似度，即对这个情景的熟悉程度(现在还只是区分了2个熟悉度：熟悉/不熟悉， 之后要改成4个熟悉度)
+      const learnEpisodeData = await this.keepSimilarEpisodeInfo(this.episodeData)
+      console.log('learnEpisodeData: ', learnEpisodeData)
+      // learn算法
+      this.learnNewEpisode(learnEpisodeData, newNode)
       // search算法
+      // 1. 首先根据task objective去定位，可以直接捕捉到最相关的一些location，那就是作为备选结果
+      const ws = new WebSocket('ws://localhost:8081')
+      ws.onopen = () => {
+        const message = {
+          type: 'searchRelatedNodes',
+          payload: newNode
+        }
+        ws.send(JSON.stringify(message))
+        console.log('ws.send.updateDataList: ', message)
+        ws.close()
+      }
+
+      // 2. 然后在这些locations中，再通过user、time去定位
+
+      // 3. 最后是通过user的style去准确定位location
 
       // 当前KG数据组
       console.log(this.$store.state.dataList)
 
       // 给出search结果
       // 在这里使用获取到的输入框的值进行处理，并将结果赋值给 answers 变量
+
       this.answers = '搜索结果' // 例如，这里将结果设置为字符串 "搜索结果"
 
       // 将结果填充到 answers-content 标签中
